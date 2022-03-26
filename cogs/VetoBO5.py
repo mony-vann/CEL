@@ -4,9 +4,6 @@ from discord.utils import get
 
 from cogs.Admin import flipCoin
 
-MAPS = ["FRACTURE", "BIND", "ASCENT", "SPLIT", "BREEZE", "HAVEN", "ICEBOX"]
-_maps = ["fracture", "bind", "ascent", "split", "breeze", "haven", "icebox"]
-SUM = []
 class VetoBO5(commands.Cog):
 
     def __init__(self, client):
@@ -18,6 +15,10 @@ class VetoBO5(commands.Cog):
     )
     @commands.has_permissions(kick_members = True)
     async def vetoBO5(self, ctx, user : discord.Member, TEAM, user1 : discord.Member, TEAM1):
+        MAPS = ["FRACTURE", "BIND", "ASCENT", "SPLIT", "BREEZE", "HAVEN", "ICEBOX"]
+        _maps = ["fracture", "bind", "ascent", "split", "breeze", "haven", "icebox"]
+        SUM = []
+        
         guild = ctx.guild
         CHECK = False
 
@@ -58,7 +59,7 @@ class VetoBO5(commands.Cog):
             else:
                 winner, wuser = TEAM1, user1
                 loser, luser = TEAM, user
-                SUM.append(f"{loser} WON THE COIN FLIP")
+                SUM.append(f"{winner} WON THE COIN FLIP")
                 await ctx.send(f'```Flipping coin result is TAIL thus TEAM {TEAM1} has WON!```')
 
             for i in MAPS:
