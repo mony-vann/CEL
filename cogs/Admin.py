@@ -55,20 +55,6 @@ class Admin(commands.Cog):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send("```You do not have the permission to use this command```")
 
-    # CHECK IF USER IS THE CAPTAIN
-    # @commands.command(pass_context = True)
-    # @commands.has_permissions(manage_roles = True)
-    # async def isCaptain(self, ctx, user : discord.Member, role : discord.Role):
-    #     if isCaptain(user, role):
-    #         await ctx.send(f"```{user.display_name} is the Captain of TEAM {str(role).upper()}```")
-    #     else:
-    #         await ctx.send(f"```{user.display_name} is not the Captain of TEAM {role}```")
-    
-    # @isCaptain.error
-    # async def isCaptain_error(self, ctx, error):
-    #     if isinstance(error, commands.MissingPermissions):
-    #         await ctx.send("```You do not have the permission to use this command```")
-
     # FLIP COIN
     @commands.command(pass_context = True)
     async def flipCoin(self, ctx):
@@ -120,61 +106,62 @@ class Admin(commands.Cog):
     @commands.command(pass_context = True)
     @commands.has_permissions(manage_roles = True, manage_channels = True)
     async def ctrChannel(self, ctx, ch_name, role : discord.Role, role1 : discord.Role):
-        guild = ctx.guild
-        exist = False
-        admin_role = get(guild.roles, name="admin")
-        bot_role = get(guild.roles, name="CEL BOT")
-        category = discord.utils.get(ctx.guild.categories, id=953556938505981992)
-        overwrites = {
-            guild.default_role: discord.PermissionOverwrite(read_messages=False),
-            role: discord.PermissionOverwrite(read_messages=True),
-            role1: discord.PermissionOverwrite(read_messages=True),
-            admin_role: discord.PermissionOverwrite(read_messages=True),
-            bot_role: discord.PermissionOverwrite(read_messages=True)
-        }
+        await ctx.send(f"```Enter a category ID: ```")
+        cate_id = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author == ctx.author)
 
-        for channel in guild.channels:
-            if str(channel.name).upper() == str(ch_name).upper():
-                exist = True
-        
-        if exist:
-            await ctx.send(f"```Text channel called {ch_name} is already existed!```")
-        else:
-            await guild.create_text_channel(name = ch_name, overwrites=overwrites, category=category)
-            await ctx.send(f"```You have created a text channel called {ch_name} assigned to {role} and {role1}```")
+        if cate_id:
+            guild = ctx.guild
+            exist = False
+            admin_role = get(guild.roles, name="admin")
+            bot_role = get(guild.roles, name="CEL BOT")
+            category = discord.utils.get(ctx.guild.categories, id=int(cate_id.content))
+            overwrites = {
+                guild.default_role: discord.PermissionOverwrite(read_messages=False),
+                role: discord.PermissionOverwrite(read_messages=True),
+                role1: discord.PermissionOverwrite(read_messages=True),
+                admin_role: discord.PermissionOverwrite(read_messages=True),
+                bot_role: discord.PermissionOverwrite(read_messages=True)
+            }
+            
+            if get(category.channels, name=ch_name) in category.channels:
+                await ctx.send(f"```Text channel called {ch_name} is already existed!```")
+            else:
+                await guild.create_text_channel(name = ch_name, overwrites=overwrites, category=category)
+                await ctx.send(f"```You have created a text channel called {ch_name} assigned to {role} and {role1} under category of {category}```")
 
     @ctrChannel.error
     async def ctrChannel_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send("```You do not have the permission to use this command```")
 
-    # CREAT TEXT CHANNEL
+    # CREATE TEXT CHANNEL
     @commands.command(pass_context = True)
     @commands.has_permissions(manage_roles = True, manage_channels = True)
     async def ctChannel(self, ctx, *, ch_names):
-        guild = ctx.guild
-        exist = False
-        admin_role = get(guild.roles, name="admin")
-        bot_role = get(guild.roles, name="CEL BOT")
-        category = discord.utils.get(ctx.guild.categories, id=952823470314622998)
-        overwrites = {
-            guild.default_role: discord.PermissionOverwrite(read_messages=True),
-            admin_role: discord.PermissionOverwrite(read_messages=True),
-            bot_role: discord.PermissionOverwrite(read_messages=True)
-        }
-        _channels = ch_names.split()
-        
-        for channel in _channels:
-            for existed_channel in guild.text_channels:
-                if str(existed_channel.name).upper() == str(channel).upper():
-                    exist = True
-            
-            if exist:
-                await ctx.send(f"```Text channel called {channel} is already existed!```")
-            else:
-                await guild.create_text_channel(name = channel, overwrites=overwrites, category=category)
-                await ctx.send(f"```You have created a text channel called {channel}```")
+        await ctx.send(f"```Enter a category ID: ```")
+        cate_id = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author == ctx.author)
 
+        if cate_id:
+            guild = ctx.guild
+            admin_role = get(guild.roles, name="admin")
+            bot_role = get(guild.roles, name="CEL BOT")
+            category = get(ctx.guild.categories, id=int(cate_id.content))
+
+            overwrites = {
+                guild.default_role: discord.PermissionOverwrite(read_messages=True),
+                admin_role: discord.PermissionOverwrite(read_messages=True),
+                bot_role: discord.PermissionOverwrite(read_messages=True)
+            }
+            _channels = ch_names.split()
+            
+            for channel in _channels:
+                if get(category.channels, name=channel) in category.channels:
+                    await ctx.send(f"```Text channel called {channel} is already existed!```")
+                else:
+                    await guild.create_text_channel(name = channel, overwrites=overwrites, category=category)
+                    await ctx.send(f"```You have created a text channel called {channel} under category of {category}```")
+                    
+                
     @ctChannel.error
     async def ctChannel_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
@@ -201,6 +188,90 @@ class Admin(commands.Cog):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send("```You do not have the permission to use this command```")
 
+    # CREATE VOICE CHANNEL
+    @commands.command(pass_context = True)
+    @commands.has_permissions(manage_roles = True, manage_channels = True)
+    async def cvChannel(self, ctx, *, ch_names):
+        await ctx.send(f"```Enter a category ID: ```")
+        cate_id = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author == ctx.author)
+
+        if cate_id:
+            guild = ctx.guild
+            admin_role = get(guild.roles, name="admin")
+            bot_role = get(guild.roles, name="CEL BOT")
+            category = get(guild.categories, id=int(cate_id.content))
+
+            overwrites = {
+                guild.default_role: discord.PermissionOverwrite(read_messages=True),
+                admin_role: discord.PermissionOverwrite(read_messages=True),
+                bot_role: discord.PermissionOverwrite(read_messages=True)
+            }
+            _channels = ch_names.split()
+            
+            for channel in _channels:
+                if get(category.channels, name=channel) in category.channels:
+                    await ctx.send(f"```Text channel called {channel} is already existed!```")
+                else:
+                    await category.create_voice_channel(name = channel, overwrites=overwrites)
+                    await ctx.send(f"```You have created a voice channel called {channel} under category of {category}```")
+    
+    @cvChannel.error
+    async def cvChannel_error(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("```You do not have the permission to use this command```")
+        
+    # CREATE VOICE CHANNEL FOR SPECIFIC ROLE
+    @commands.command(pass_context = True)
+    @commands.has_permissions(manage_roles = True, manage_channels = True)
+    async def cvrChannel(self, ctx, ch_name, role : discord.Role, role1 : discord.Role):
+        await ctx.send(f"```Enter a category ID: ```")
+        cate_id = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author == ctx.author)
+
+        if cate_id:
+            guild = ctx.guild
+            exist = False
+            admin_role = get(guild.roles, name="admin")
+            bot_role = get(guild.roles, name="CEL BOT")
+            category = discord.utils.get(ctx.guild.categories, id=int(cate_id.content))
+            overwrites = {
+                guild.default_role: discord.PermissionOverwrite(read_messages=False),
+                role: discord.PermissionOverwrite(read_messages=True),
+                role1: discord.PermissionOverwrite(read_messages=True),
+                admin_role: discord.PermissionOverwrite(read_messages=True),
+                bot_role: discord.PermissionOverwrite(read_messages=True)
+            }
+
+            if get(category.channels, name=ch_name) in category.channels:
+                await ctx.send(f"```Text channel called {ch_name} is already existed!```")
+            else:
+                await guild.create_voice_channel(name = ch_name, overwrites=overwrites, category=category)
+                await ctx.send(f"```You have created a voice channel called {ch_name} assigned to {role} and {role1} under category of {category}```")
+
+    @cvrChannel.error
+    async def cvrChannel_error(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("```You do not have the permission to use this command```")
+    
+    # DELETE VOICE CHANNEL
+    @commands.command(pass_context = True)
+    @commands.has_permissions(manage_channels = True)
+    async def dlvChannel(self, ctx, *, ch_names):
+        guild = ctx.guild
+        _channels = ch_names.split()
+        
+        for channel in _channels:
+            existing_channel = get(guild.voice_channels, name=channel)
+
+            if existing_channel is not None:
+                await existing_channel.delete()
+                await ctx.send(f"```Voice channel called {existing_channel} is deleted!```")
+            else:
+                await ctx.send(f"```Voice channel called {channel} is not exist!```")
+    
+    @dlvChannel.error
+    async def dlvChannel_error(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("```You do not have the permission to use this command```")
 
 def get_role(user : discord.Member):
         return user._roles
