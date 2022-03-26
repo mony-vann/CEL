@@ -4,9 +4,7 @@ from discord.utils import get
 
 from cogs.Admin import flipCoin
 
-MAPS = ["FRACTURE", "BIND", "ASCENT", "SPLIT", "BREEZE", "HAVEN", "ICEBOX"]
-_maps = ["fracture", "bind", "ascent", "split", "breeze", "haven", "icebox"]
-SUM = []
+
 class VetoBO1(commands.Cog):
 
     def __init__(self, client):
@@ -18,6 +16,10 @@ class VetoBO1(commands.Cog):
     )
     @commands.has_permissions(kick_members = True)
     async def vetoBO1(self, ctx, user : discord.Member, TEAM, user1 : discord.Member, TEAM1):
+        MAPS = ["FRACTURE", "BIND", "ASCENT", "SPLIT", "BREEZE", "HAVEN", "ICEBOX"]
+        _maps = ["fracture", "bind", "ascent", "split", "breeze", "haven", "icebox"]
+        SUM = []
+
         guild = ctx.guild
         CHECK = False
 
@@ -58,7 +60,7 @@ class VetoBO1(commands.Cog):
             else:
                 winner, wuser = TEAM1, user1
                 loser, luser = TEAM, user
-                SUM.append(f"{loser} WON THE COIN FLIP")
+                SUM.append(f"{winner} WON THE COIN FLIP")
                 await ctx.send(f'```Flipping coin result is TAIL thus TEAM {TEAM1} has WON!```')
 
             for i in MAPS:
@@ -117,7 +119,7 @@ class VetoBO1(commands.Cog):
             while ROUND3:
                 await ctx.send(f"```AVAILABLE MAPS TO BAN:\n{maps}```")
                 await ctx.send(f"```{winner}'s TURN TO BAN: ```")
-                msg2 = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author.id == wuser.id)
+                msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author.id == wuser.id)
 
                 if msg:
                     if str(msg.content).lower() in _maps:
