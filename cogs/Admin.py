@@ -64,7 +64,7 @@ class Admin(commands.Cog):
 
     # CREATE ROLES
     @commands.command(pass_context = True)
-    @commands.has_permissions(manage_roles = True)
+    @commands.has_permissions(kick_members = True)
     async def crRoles(self, ctx, *, names):
         guild = ctx.guild
         perms = discord.Permissions(view_channel=True)
