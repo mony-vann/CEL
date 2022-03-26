@@ -16,7 +16,7 @@ class Admin(commands.Cog):
 
     # GIVE ROLE TO USERS
     @commands.command(pass_context = True)
-    @commands.has_permissions(manage_roles = True)
+    @commands.has_permissions(administrator = True)
     async def giveRole(self, ctx, role, users: commands.Greedy[discord.Member]):
         guild = ctx.guild
         perms = discord.Permissions(view_channel=True)
@@ -64,7 +64,7 @@ class Admin(commands.Cog):
 
     # CREATE ROLES
     @commands.command(pass_context = True)
-    @commands.has_permissions(kick_members = True)
+    @commands.has_permissions(administrator = True)
     async def crRoles(self, ctx, *, names):
         guild = ctx.guild
         perms = discord.Permissions(view_channel=True)
@@ -104,7 +104,7 @@ class Admin(commands.Cog):
 
     # CREATE TEXT CHANNEL FOR SPECIFIC ROLE
     @commands.command(pass_context = True)
-    @commands.has_permissions(manage_roles = True, manage_channels = True)
+    @commands.has_permissions(manage_roles = True)
     async def ctrChannel(self, ctx, ch_name, role : discord.Role, role1 : discord.Role):
         await ctx.send(f"```Enter a category ID: ```")
         cate_id = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author == ctx.author)
@@ -112,7 +112,7 @@ class Admin(commands.Cog):
         if cate_id:
             guild = ctx.guild
             exist = False
-            admin_role = get(guild.roles, name="admin")
+            admin_role = get(guild.roles, name="ADMIN")
             bot_role = get(guild.roles, name="CEL BOT")
             category = discord.utils.get(ctx.guild.categories, id=int(cate_id.content))
             overwrites = {
@@ -136,14 +136,14 @@ class Admin(commands.Cog):
 
     # CREATE TEXT CHANNEL
     @commands.command(pass_context = True)
-    @commands.has_permissions(manage_roles = True, manage_channels = True)
+    @commands.has_permissions(manage_roles = True)
     async def ctChannel(self, ctx, *, ch_names):
         await ctx.send(f"```Enter a category ID: ```")
         cate_id = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author == ctx.author)
 
         if cate_id:
             guild = ctx.guild
-            admin_role = get(guild.roles, name="admin")
+            admin_role = get(guild.roles, name="ADMIN")
             bot_role = get(guild.roles, name="CEL BOT")
             category = get(ctx.guild.categories, id=int(cate_id.content))
 
@@ -190,14 +190,14 @@ class Admin(commands.Cog):
 
     # CREATE VOICE CHANNEL
     @commands.command(pass_context = True)
-    @commands.has_permissions(manage_roles = True, manage_channels = True)
+    @commands.has_permissions(manage_roles = True)
     async def cvChannel(self, ctx, *, ch_names):
         await ctx.send(f"```Enter a category ID: ```")
         cate_id = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author == ctx.author)
 
         if cate_id:
             guild = ctx.guild
-            admin_role = get(guild.roles, name="admin")
+            admin_role = get(guild.roles, name="ADMIN")
             bot_role = get(guild.roles, name="CEL BOT")
             category = get(guild.categories, id=int(cate_id.content))
 
@@ -223,20 +223,18 @@ class Admin(commands.Cog):
     # CREATE VOICE CHANNEL FOR SPECIFIC ROLE
     @commands.command(pass_context = True)
     @commands.has_permissions(manage_roles = True, manage_channels = True)
-    async def cvrChannel(self, ctx, ch_name, role : discord.Role, role1 : discord.Role):
+    async def cvrChannel(self, ctx, ch_name, role : discord.Role):
         await ctx.send(f"```Enter a category ID: ```")
         cate_id = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author == ctx.author)
 
         if cate_id:
             guild = ctx.guild
-            exist = False
-            admin_role = get(guild.roles, name="admin")
+            admin_role = get(guild.roles, name="ADMIN")
             bot_role = get(guild.roles, name="CEL BOT")
             category = discord.utils.get(ctx.guild.categories, id=int(cate_id.content))
             overwrites = {
                 guild.default_role: discord.PermissionOverwrite(read_messages=False),
                 role: discord.PermissionOverwrite(read_messages=True),
-                role1: discord.PermissionOverwrite(read_messages=True),
                 admin_role: discord.PermissionOverwrite(read_messages=True),
                 bot_role: discord.PermissionOverwrite(read_messages=True)
             }
@@ -245,7 +243,7 @@ class Admin(commands.Cog):
                 await ctx.send(f"```Text channel called {ch_name} is already existed!```")
             else:
                 await guild.create_voice_channel(name = ch_name, overwrites=overwrites, category=category)
-                await ctx.send(f"```You have created a voice channel called {ch_name} assigned to {role} and {role1} under category of {category}```")
+                await ctx.send(f"```You have created a voice channel called {ch_name} assigned to {role} under category of {category}```")
 
     @cvrChannel.error
     async def cvrChannel_error(self, ctx, error):
