@@ -4,9 +4,6 @@ from discord.utils import get
 
 from cogs.Admin import flipCoin
 
-MAPS = ["FRACTURE", "BIND", "ASCENT", "SPLIT", "BREEZE", "HAVEN", "ICEBOX"]
-_maps = ["fracture", "bind", "ascent", "split", "breeze", "haven", "icebox"]
-SUM = []
 
 class VetoBO2(commands.Cog):
 
@@ -19,6 +16,10 @@ class VetoBO2(commands.Cog):
     )
     @commands.has_permissions(kick_members = True)
     async def vetoBO2(self, ctx, user : discord.Member, TEAM, user1 : discord.Member, TEAM1):
+        MAPS = ["FRACTURE", "BIND", "ASCENT", "SPLIT", "BREEZE", "HAVEN", "ICEBOX"]
+        _maps = ["fracture", "bind", "ascent", "split", "breeze", "haven", "icebox"]
+        SUM = []
+
         guild = ctx.guild
         CHECK = False
 
@@ -59,7 +60,7 @@ class VetoBO2(commands.Cog):
             else:
                 winner, wuser = TEAM1, user1
                 loser, luser = TEAM, user
-                SUM.append(f"{loser} WON THE COIN FLIP")
+                SUM.append(f"{winner} WON THE COIN FLIP")
                 await ctx.send(f'```Flipping coin result is TAIL thus TEAM {TEAM1} has WON!```')
 
             for i in MAPS:
@@ -230,7 +231,7 @@ class VetoBO2(commands.Cog):
                             elif str(msg1.content).lower() == "attack":
                                 await ctx.send(f"```TEAM {winner} CHOSE ATTACK THUS TEAM {loser} WILL DEFEND!```")
                                 SUMMARY = True
-                                SUM.append(loser + " CHOSE ATTACK ON " + str(msg.content).upper())
+                                SUM.append(winner + " CHOSE ATTACK ON " + str(msg.content).upper())
                             else:
                                 _maps.append(str(msg.content).lower())
                                 MAPS.append(str(msg.content).upper())
