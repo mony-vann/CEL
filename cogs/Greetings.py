@@ -21,7 +21,7 @@ class Greetings(commands.Cog):
         self.client = client
 
     @commands.command()
-    async def commands(self, ctx):
+    async def cmd(self, ctx):
         cmd_list = ""
         for i in COMMANDS:
             cmd_list += i + "\n"
