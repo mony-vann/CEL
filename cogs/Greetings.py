@@ -30,7 +30,7 @@ class Greetings(commands.Cog):
 
     @commands.command()
     async def desc(self, ctx):
-        await ctx.send("```A bot created mainly for CEL discord for veto process. It's still young as of right now it's a version 1.0.1 and will continue to grow overtime :D. Develpoed by Zen様#7756 ```")
+        await ctx.send("```A bot created mainly for CEL discord for veto process. It's still young as of right now it's a version 1.0.1 and will continue to grow overtime :D. Developed by Zen様#7756 ```")
 
 def setup(client):
     client.add_cog(Greetings(client))
