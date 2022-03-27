@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from discord.utils import get
+import asyncio
 
 from cogs.Admin import flipCoin
 
@@ -45,7 +46,7 @@ class VetoBO1(commands.Cog):
             ROUND7= False
             SUMMARY = False
             
-            await ctx.send(f"```{user.display_name} from TEAM {str(TEAM).upper()} is HEAD. \n{user1.display_name} from {str(TEAM1).upper()} is TAIL. ```")
+            await ctx.send(f"```{user.display_name} from TEAM {str(TEAM).upper()} is HEAD. \n{user1.display_name} from TEAM {str(TEAM1).upper()} is TAIL. ```")
 
             for i in range(0,3):
                 await ctx.send(f"```Flipping coin...```")
@@ -69,171 +70,233 @@ class VetoBO1(commands.Cog):
             while ROUND1:
                 await ctx.send(f"```MAP BANNING PHASE\nAVAILABLE MAPS TO BAN: \n\n{maps}```")
                 await ctx.send(f"```{winner}'s TURN TO BAN: ```")
+
+                msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel) #and ctx.author.id == winner.id message.author ==ctx.author
                 
-                msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author.id == wuser.id) #and ctx.author.id == winner.id message.author ==ctx.author
-
                 if msg:
-                    if str(msg.content).lower() in _maps:
-                        maps = ""
-                        _maps.remove(str(msg.content).lower())
-                        MAPS.remove(str(msg.content).upper())
-                        for i in MAPS:
-                            maps += '\n' + str(i)
-                            
-                        await ctx.send(f"```TEAM {winner} BANNED {str(msg.content).upper()}```")
-                        SUM.append(winner + " BANNED " + str(msg.content).upper())
+                    if msg.author.id == wuser.id:
+                        if str(msg.content).lower() in _maps:
+                            maps = ""
+                            _maps.remove(str(msg.content).lower())
+                            MAPS.remove(str(msg.content).upper())
+                            for i in MAPS:
+                                maps += '\n' + str(i)
+                                
+                            await ctx.send(f"```TEAM {winner} BANNED {str(msg.content).upper()}```")
+                            SUM.append(winner + " BANNED " + str(msg.content).upper())
 
-                        ROUND2 = True
-                        break
-                    elif str(msg.content).lower() == "cancel":
-                        await ctx.send(f"```VETO PROCESS HAS BEEN CANCELED```")
-                        break
+                            ROUND2 = True
+                            break
+                        
+                        else:
+                            await ctx.send(f"```Map invalid!```")
+                            continue
+
+                    elif msg.author.id == luser.id:
+                        await ctx.send(f"```WARNING! PLEASE WAIT FOR YOUR TURN!```")
+                        
+                    elif msg.author.id == ctx.author.id:
+                        if str(msg.content).lower() == "cancel":
+                            await ctx.send(f"```VETO PROCESS HAS BEEN CANCELED```")
+                            break
                     else:
-                        await ctx.send(f"```Map invalid!```")
-                        continue
+                        await ctx.send(f"```WARNING! {msg.author.name}, YOU ARE NOT IN THIS VETO PROCESS!```")
 
             while ROUND2:
                 await ctx.send(f"```AVAILABLE MAPS TO BAN:\n{maps}```")
                 await ctx.send(f"```{loser}'s TURN TO BAN: ```")
-                msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author.id == luser.id)
+                msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel)
 
                 if msg:
-                    if str(msg.content).lower() in _maps:
-                        maps = ""
-                        _maps.remove(str(msg.content).lower())
-                        MAPS.remove(str(msg.content).upper())
-                        for i in MAPS:
-                            maps += '\n' + str(i)
-                        await ctx.send(f"```TEAM {loser} BANNED {str(msg.content).upper()}```")
-                        SUM.append(loser + " BANNED " + str(msg.content).upper())
+                    if msg.author.id == luser.id:
+                        if str(msg.content).lower() in _maps:
+                            maps = ""
+                            _maps.remove(str(msg.content).lower())
+                            MAPS.remove(str(msg.content).upper())
+                            for i in MAPS:
+                                maps += '\n' + str(i)
+                            await ctx.send(f"```TEAM {loser} BANNED {str(msg.content).upper()}```")
+                            SUM.append(loser + " BANNED " + str(msg.content).upper())
 
-                        ROUND3 = True
-                        break
-                    elif str(msg.content).lower() == "cancel":
-                        await ctx.send(f"```VETO PROCESS HAS BEEN CANCELED```")
-                        break
+                            ROUND3 = True
+                            break
+
+                        else:
+                            await ctx.send(f"```Map invalid!```")
+                            continue
+
+                    elif msg.author.id == wuser.id:
+                        await ctx.send(f"```WARNING! PLEASE WAIT FOR YOUR TURN!```")
+                        
+                    elif msg.author.id == ctx.author.id:
+                        if str(msg.content).lower() == "cancel":
+                            await ctx.send(f"```VETO PROCESS HAS BEEN CANCELED```")
+                            break
                     else:
-                        await ctx.send(f"```Map invalid!```")
-                        continue
+                        await ctx.send(f"```WARNING! {msg.author.name}, YOU ARE NOT IN THIS VETO PROCESS!```")
 
             while ROUND3:
                 await ctx.send(f"```AVAILABLE MAPS TO BAN:\n{maps}```")
                 await ctx.send(f"```{winner}'s TURN TO BAN: ```")
-                msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author.id == wuser.id)
+                msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel)
 
                 if msg:
-                    if str(msg.content).lower() in _maps:
-                        maps = ""
-                        _maps.remove(str(msg.content).lower())
-                        MAPS.remove(str(msg.content).upper())
-                        for i in MAPS:
-                            maps += '\n' + str(i)
-                        await ctx.send(f"```TEAM {winner} BANNED {str(msg.content).upper()}```")
-                        SUM.append(winner + " BANNED " + str(msg.content).upper())
+                    if msg.author.id == wuser.id:
+                        if str(msg.content).lower() in _maps:
+                            maps = ""
+                            _maps.remove(str(msg.content).lower())
+                            MAPS.remove(str(msg.content).upper())
+                            for i in MAPS:
+                                maps += '\n' + str(i)
+                            await ctx.send(f"```TEAM {winner} BANNED {str(msg.content).upper()}```")
+                            SUM.append(winner + " BANNED " + str(msg.content).upper())
 
-                        ROUND4 = True
-                        break
-                    elif str(msg.content).lower() == "cancel":
-                        await ctx.send(f"```VETO PROCESS HAS BEEN CANCELED```")
-                        break
+                            ROUND4 = True
+                            break
+
+                        else:
+                            await ctx.send(f"```Map invalid!```")
+                            continue
+
+                    elif msg.author.id == luser.id:
+                        await ctx.send(f"```WARNING! PLEASE WAIT FOR YOUR TURN!```")
+                        
+                    elif msg.author.id == ctx.author.id:
+                        if str(msg.content).lower() == "cancel":
+                            await ctx.send(f"```VETO PROCESS HAS BEEN CANCELED```")
+                            break
                     else:
-                        await ctx.send(f"```Map invalid!```")
-                        continue
+                        await ctx.send(f"```WARNING! {msg.author.name}, YOU ARE NOT IN THIS VETO PROCESS!```")
 
             while ROUND4:
                 await ctx.send(f"```AVAILABLE MAPS TO BAN:\n{maps}```")
                 await ctx.send(f"```{loser}'s TURN TO BAN: ```")
-                msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author.id == luser.id)
+                msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel)
 
                 if msg:
-                    if str(msg.content).lower() in _maps:
-                        maps = ""
-                        _maps.remove(str(msg.content).lower())
-                        MAPS.remove(str(msg.content).upper())
-                        for i in MAPS:
-                            maps += '\n' + str(i)
-                        await ctx.send(f"```TEAM {loser} BANNED {str(msg.content).upper()}```")
-                        SUM.append(loser + " BANNED " + str(msg.content).upper())
+                    if msg.author.id == luser.id:
+                        if str(msg.content).lower() in _maps:
+                            maps = ""
+                            _maps.remove(str(msg.content).lower())
+                            MAPS.remove(str(msg.content).upper())
+                            for i in MAPS:
+                                maps += '\n' + str(i)
+                            await ctx.send(f"```TEAM {loser} BANNED {str(msg.content).upper()}```")
+                            SUM.append(loser + " BANNED " + str(msg.content).upper())
 
-                        ROUND5 = True
-                        break
-                    elif str(msg.content).lower() == "cancel":
-                        await ctx.send(f"```VETO PROCESS HAS BEEN CANCELED```")
-                        break
+                            ROUND5 = True
+                            break
+                        
+                        else:
+                            await ctx.send(f"```Map invalid!```")
+                            continue
+                    
+                    elif msg.author.id == wuser.id:
+                        await ctx.send(f"```WARNING! PLEASE WAIT FOR YOUR TURN!```")
+                        
+                    elif msg.author.id == ctx.author.id:
+                        if str(msg.content).lower() == "cancel":
+                            await ctx.send(f"```VETO PROCESS HAS BEEN CANCELED```")
+                            break
                     else:
-                        await ctx.send(f"```Map invalid!```")
-                        continue
+                        await ctx.send(f"```WARNING! {msg.author.name}, YOU ARE NOT IN THIS VETO PROCESS!```")
+                    
 
             while ROUND5:
                 await ctx.send(f"```AVAILABLE MAPS TO BAN:\n{maps}```")
                 await ctx.send(f"```{winner}'s TURN TO BAN: ```")
-                msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author.id == wuser.id)
+                msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel)
 
                 if msg:
-                    if str(msg.content).lower() in _maps:
-                        maps = ""
-                        _maps.remove(str(msg.content).lower())
-                        MAPS.remove(str(msg.content).upper())
-                        for i in MAPS:
-                            maps += '\n' + str(i)
-                        await ctx.send(f"```TEAM {winner} BANNED {str(msg.content).upper()}```")
-                        SUM.append(winner + " BANNED " + str(msg.content).upper())
+                    if msg.author.id == wuser.id:
+                        if str(msg.content).lower() in _maps:
+                            maps = ""
+                            _maps.remove(str(msg.content).lower())
+                            MAPS.remove(str(msg.content).upper())
+                            for i in MAPS:
+                                maps += '\n' + str(i)
+                            await ctx.send(f"```TEAM {winner} BANNED {str(msg.content).upper()}```")
+                            SUM.append(winner + " BANNED " + str(msg.content).upper())
 
-                        ROUND6 = True
-                        break
-                    elif str(msg.content).lower() == "cancel":
-                        await ctx.send(f"```VETO PROCESS HAS BEEN CANCELED```")
-                        break
+                            ROUND6 = True
+                            break
+                        else:
+                            await ctx.send(f"```Map invalid!```")
+                            continue
+
+                    elif msg.author.id == luser.id:
+                        await ctx.send(f"```WARNING! PLEASE WAIT FOR YOUR TURN!```")
+                        
+                    elif msg.author.id == ctx.author.id:
+                        if str(msg.content).lower() == "cancel":
+                            await ctx.send(f"```VETO PROCESS HAS BEEN CANCELED```")
+                            break
                     else:
-                        await ctx.send(f"```Map invalid!```")
-                        continue
+                        await ctx.send(f"```WARNING! {msg.author.name}, YOU ARE NOT IN THIS VETO PROCESS!```")
             
             while ROUND6:
                 await ctx.send(f"```AVAILABLE MAPS TO BAN:\n{maps}```")
                 await ctx.send(f"```{loser}'s TURN TO BAN: ```")
-                msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author.id == luser.id)
+                msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel)
 
                 if msg:
-                    if str(msg.content).lower() in _maps:
-                        maps = ""
-                        _maps.remove(str(msg.content).lower())
-                        MAPS.remove(str(msg.content).upper())
-                        for i in MAPS:
-                            maps += '\n' + str(i)
-                        await ctx.send(f"```TEAM {loser} BANNED {str(msg.content).upper()}```")
-                        SUM.append(loser + " BANNED " + str(msg.content).upper())
+                    if msg.author.id == luser.id:
+                        if str(msg.content).lower() in _maps:
+                            maps = ""
+                            _maps.remove(str(msg.content).lower())
+                            MAPS.remove(str(msg.content).upper())
+                            for i in MAPS:
+                                maps += '\n' + str(i)
+                            await ctx.send(f"```TEAM {loser} BANNED {str(msg.content).upper()}```")
+                            SUM.append(loser + " BANNED " + str(msg.content).upper())
 
-                        ROUND7 = True
-                        break
-                    elif str(msg.content).lower() == "cancel":
-                        await ctx.send(f"```VETO PROCESS HAS BEEN CANCELED```")
-                        break
+                            ROUND7 = True
+                            break
+                        
+                        else:
+                            await ctx.send(f"```Map invalid!```")
+                            continue
+
+                    elif msg.author.id == wuser.id:
+                        await ctx.send(f"```WARNING! PLEASE WAIT FOR YOUR TURN!```")
+                        
+                    elif msg.author.id == ctx.author.id:
+                        if str(msg.content).lower() == "cancel":
+                            await ctx.send(f"```VETO PROCESS HAS BEEN CANCELED```")
+                            break
                     else:
-                        await ctx.send(f"```Map invalid!```")
-                        continue
+                        await ctx.send(f"```WARNING! {msg.author.name}, YOU ARE NOT IN THIS VETO PROCESS!```")
 
             while ROUND7:
                 await ctx.send(f"```THE LAST REMAINING MAP IS: {maps}```")
                 await ctx.send(f"```{winner}'s WILL NOW PICK SIDE (DEFEND|ATTACK): ```")
-                msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author.id == wuser.id)
+                msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel)
 
                 if msg:
-                    if str(msg.content).lower() == "defend":
-                        await ctx.send(f"```TEAM {winner} CHOSE DEFEND THUS TEAM {loser} WILL ATTACK!```")
-                        SUMMARY = True
-                        SUM.append(winner + " CHOSE DEFEND ON " + MAPS[0])
-                        break
-                    elif str(msg.content).lower() == "attack":
-                        await ctx.send(f"```TEAM {winner} CHOSE ATTACK THUS TEAM {loser} WILL DEFEND!```")
-                        SUMMARY = True
-                        SUM.append(winner + " CHOSE DEFEND ON " + MAPS[0])
-                        break
-                    elif str(msg.content).lower() == "cancel":
-                        await ctx.send(f"```VETO PROCESS HAS BEEN CANCELED```")
-                        break
+                    if msg.author.id == wuser.id:
+                        if str(msg.content).lower() == "defend" or str(msg.content).lower() == "def":
+                            await ctx.send(f"```TEAM {winner} CHOSE DEFEND THUS TEAM {loser} WILL ATTACK!```")
+                            SUMMARY = True
+                            SUM.append(winner + " CHOSE DEFEND ON " + MAPS[0])
+                            break
+                        elif str(msg.content).lower() == "attack" or str(msg.content).lower() == "att":
+                            await ctx.send(f"```TEAM {winner} CHOSE ATTACK THUS TEAM {loser} WILL DEFEND!```")
+                            SUMMARY = True
+                            SUM.append(winner + " CHOSE DEFEND ON " + MAPS[0])
+                            break
+                        else:
+                            await ctx.send(f"```Side invalid!```")
+                            continue
+
+                    elif msg.author.id == luser.id:
+                        await ctx.send(f"```WARNING! THIS IS NOT YOUR TURN!```")
+                        
+                    elif msg.author.id == ctx.author.id:
+                        if str(msg.content).lower() == "cancel":
+                            await ctx.send(f"```VETO PROCESS HAS BEEN CANCELED```")
+                            break
                     else:
-                        await ctx.send(f"```Side invalid!```")
-                        continue
+                        await ctx.send(f"```WARNING! {msg.author.name}, YOU ARE NOT IN THIS VETO PROCESS!```")
             
             while SUMMARY:
                 temp = ""
