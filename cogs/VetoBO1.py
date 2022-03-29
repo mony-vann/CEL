@@ -68,7 +68,7 @@ class VetoBO1(commands.Cog):
                 maps += str(i) + '\n'
 
             while ROUND1:
-                await ctx.send(f"```MAP BANNING PHASE\nAVAILABLE MAPS TO BAN: \n\n{maps}```")
+                await ctx.send(f"```MAP BANNING PHASE\nAVAILABLE MAPS TO BAN: \n\n{maps}\nTYPE IN ONLY THE NAME OF THE MAP```")
                 await ctx.send(f"```{winner}'s TURN TO BAN: ```")
 
                 msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel) #and ctx.author.id == winner.id message.author ==ctx.author
@@ -277,12 +277,14 @@ class VetoBO1(commands.Cog):
                         if str(msg.content).lower() == "defend" or str(msg.content).lower() == "def":
                             await ctx.send(f"```TEAM {winner} CHOSE DEFEND THUS TEAM {loser} WILL ATTACK!```")
                             SUMMARY = True
+                            SUM.append("BOTH TEAM WILL PLAY ON " + MAPS[0])
                             SUM.append(winner + " CHOSE DEFEND ON " + MAPS[0])
                             break
                         elif str(msg.content).lower() == "attack" or str(msg.content).lower() == "att":
                             await ctx.send(f"```TEAM {winner} CHOSE ATTACK THUS TEAM {loser} WILL DEFEND!```")
                             SUMMARY = True
-                            SUM.append(winner + " CHOSE DEFEND ON " + MAPS[0])
+                            SUM.append("BOTH TEAM WILL PLAY ON " + MAPS[0])
+                            SUM.append(winner + " CHOSE ATTACK ON " + MAPS[0])
                             break
                         else:
                             await ctx.send(f"```Side invalid!```")
