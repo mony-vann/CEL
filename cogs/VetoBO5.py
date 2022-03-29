@@ -68,7 +68,7 @@ class VetoBO5(commands.Cog):
                 maps += str(i) + '\n'
 
             while ROUND1:
-                await ctx.send(f"```MAP BANNING PHASE\nAVAILABLE MAPS TO BAN: \n\n{maps}```")
+                await ctx.send(f"```MAP BANNING PHASE\nAVAILABLE MAPS TO BAN: \n\n{maps}\nTYPE IN ONLY THE NAME OF THE MAP```")
                 await ctx.send(f"```{winner}'s TURN TO BAN: ```")
                 
                 msg = await self.client.wait_for('message', check=lambda message: message.channel == ctx.channel and message.author.id == wuser.id) #and ctx.author.id == winner.id message.author ==ctx.author
