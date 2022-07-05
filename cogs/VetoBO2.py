@@ -16,8 +16,8 @@ class VetoBO2(commands.Cog):
     )
     @commands.has_permissions(kick_members = True)
     async def vetoBO2(self, ctx, user : discord.Member, TEAM, user1 : discord.Member, TEAM1):
-        MAPS = ["FRACTURE", "BIND", "ASCENT", "SPLIT", "BREEZE", "HAVEN", "ICEBOX"]
-        _maps = ["fracture", "bind", "ascent", "split", "breeze", "haven", "icebox"]
+        MAPS = ["FRACTURE", "BIND", "ASCENT", "PEARL", "BREEZE", "HAVEN", "ICEBOX"]
+        _maps = ["fracture", "bind", "ascent", "pearl", "breeze", "haven", "icebox"]
         SUM = []
 
         guild = ctx.guild
